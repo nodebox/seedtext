@@ -1,0 +1,41 @@
+{
+  "name": "seedtext",
+  "version": "1.0.0",
+  "description": "Template-based procedural content generator for text, shapes and images",
+  "main": "core.js",
+  "files": [
+    "core.js"
+  ],
+  "dependencies": {
+    "newline-remove": "^1.0.2",
+    "seedrandom": "^2.4.3"
+  },
+  "scripts": {
+    "test": "node coreTests.js",
+    "prepublish": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodebox/seedtext.git"
+  },
+  "keywords": [
+    "template",
+    "procedural",
+    "generation",
+    "text",
+    "generation",
+    "seed",
+    "seedtext"
+  ],
+  "contributors": [
+    "Frederik De Bleser <frederik@debleser.be>",
+    "Stefan Gabriëls <stefan.gabriels@gmail.com",
+    "Lieven Menschaert <lievenmenschaert@gmail.com>",
+    "Kunal Mohta <kunalmohta1818@gmail.com>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nodebox/seedtext/issues"
+  },
+  "homepage": "https://github.com/nodebox/seedtext#readme"
+}

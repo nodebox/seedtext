@@ -1,0 +1,7 @@
+.DS_Store
+*.log
+_build
+node_modules
+playground
+editor.js
+loadSketchIdeas.txt
