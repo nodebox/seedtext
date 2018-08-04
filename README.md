@@ -3,7 +3,7 @@
 
 ## About
 
-SeedText is a JavaScript based procedural content generator, available as an [NPM module][https://npmjs.com/package/seedtext]. It has been created by the [EMRG][https://www.emrg.be/] group based in Antwerp, Belgium. 
+SeedText is a JavaScript based procedural content generator, available as an [NPM module](https://npmjs.com/package/seedtext). It has been created by the [EMRG](https://www.emrg.be/) group based in Antwerp, Belgium. 
 
 ##Installation
 
@@ -15,7 +15,7 @@ SeedText is available as a standard NPM module so it can be easily installed usi
 
 ### Overview
 
-From a high-level perspective, SeedText can be thought of as a seeded templating engine with extra capabilities. There are two parts that need to be present for it to work - the core content-generating engine and a template written in Seed microlanguage.  SeedText plays the role of the core engine, template written in Seed must be supplied externally. For more information on writing Seed templates, see the respective [documentation][https://seed.emrg.be/docs]. Sample Seed templates can also be seen in _templates/sample_ subdirectory of this repository.
+From a high-level perspective, SeedText can be thought of as a seeded templating engine with extra capabilities. There are two parts that need to be present for it to work - the core content-generating engine and a template written in Seed microlanguage.  SeedText plays the role of the core engine, template written in Seed must be supplied externally. For more information on writing Seed templates, see the respective [documentation](https://seed.emrg.be/docs). Sample Seed templates can also be seen in _templates/sample_ subdirectory of this repository.
 
 ### Methods
 
@@ -89,7 +89,7 @@ The core library offers access to the SeedText using these methods:
 
 ### Using a Seed Source File
 
-The information provided in this part assumes that you already have written your Seed source file. To see documentation on writing Seed source files, [visit this page][https://seed.emrg.be/docs]. 
+The information provided in this part assumes that you already have written your Seed source file. To see documentation on writing Seed source files, [visit this page](https://seed.emrg.be/docs). 
 
 Once the Seed source file is ready to be plugged in to the SeedText, the usage is quite simple. A full example can be seen in this repository in file _templates/seedTextUsage.js_. Below is a step-by-step description of the example code with description.
 
@@ -142,13 +142,13 @@ The result is logged into console and is being run through JSON.stringify() befo
 
 ### Using SeedText in Different Settings
 
-SeedText has been designed in a way that allows many different applications to be build on top of it. By accessing the available methods, input from various sources can be plugged in and processed. SeedText has been previously used in a [web application][https://seed.emrg.be/] or as a text-generating module for a [Twitter Bot][https://github.com/clips/gsoc2018/tree/master/twitter-bot]. The mentioned examples are just illustrative; with appropriate calls, SeedText can be used in any sort of application.
+SeedText has been designed in a way that allows many different applications to be build on top of it. By accessing the available methods, input from various sources can be plugged in and processed. SeedText has been previously used in a [web application](https://seed.emrg.be/) or as a text-generating module for a [Twitter Bot](https://github.com/clips/gsoc2018/tree/master/twitter-bot). The mentioned examples are just illustrative; with appropriate calls, SeedText can be used in any sort of application.
 
-It is also worth noting that while SeedText strictly accepts text data as an input, it can easily be used to produce images defined textually (such as SVG) or to generate websites by manipulating HTML. The previously mentioned [Seed web application][[https://seed.emrg.be/]  shows these and many other possible uses. 
+It is also worth noting that while SeedText strictly accepts text data as an input, it can easily be used to produce images defined textually (such as SVG) or to generate websites by manipulating HTML. The previously mentioned [Seed web application](https://seed.emrg.be/) shows these and many other possible uses. 
 
 ## Dependencies
 
-SeedText has a dependency on very few NPM packages. There is dependency on [seedrandom][https://www.npmjs.com/package/seedrandom], which is used for seeding the procedural generation process, the [request][https://www.npmjs.com/package/request] dependency for fetching resources from URL when importing sketches and built-in [fs][https://nodejs.org/api/fs.html] module is also being used for importing of sketches.
+SeedText has a dependency on very few NPM packages. There is dependency on [seedrandom](https://www.npmjs.com/package/seedrandom), which is used for seeding the procedural generation process, the [request](https://www.npmjs.com/package/request) dependency for fetching resources from URL when importing sketches and built-in [fs](https://nodejs.org/api/fs.html) module is also being used for importing of sketches.
 
 ## License
 
