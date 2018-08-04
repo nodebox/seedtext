@@ -56,10 +56,20 @@ function getURLParameter(name, url) {
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
-
+/**
+ * Async method wrapper for asynchronously execute eval with a callback.
+ * @param {*} code The code to be evaluated
+ * @param {*} callback The callback with result of evaluation.
+ */
+async function asyncEval(code, callback) {
+    let result = eval(code);
+    callback(result);
+}
 
 const VARIABLE_TAG_START = '{{';
 const VARIABLE_TAG_END = '}}';
+const CONDITION_TAG_START = '([';
+const CONDITION_TAG_END = '])';
 const REF_START = 'ref_start';
 const REF_END = 'ref_end';
 const TEXT = 'text';
@@ -83,10 +93,27 @@ const LBRACK = '[';
 const RBRACK = ']';
 const COMMA = ',';
 const COLON = ':';
+// Token symbols for conditional expressions. No longer needed
+// becasue of the change in the way that conditional expressions 
+// are  handled.
+// const LESS_THAN = '<';
+// const LESS_OR_EQUAL = '<=';
+// const GREATER_THAN = '>';
+// const GREATER_OR_EQUAL = '>=';
+// const EQUAL_TO = '==';
+// const EQUAL_TO_TYPED = '===';
+// const UNEQUAL_TO = '!=';
+// const UNEQUAL_TO_TYPED = '!==';
+// const AND = '&&';
+// const OR = '||';
+// const NOT = '!';
+const WILDCARD_SIGN = '_';
 
 const DIGITS = '0123456789';
 const ALPHA = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ALPHANUM = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._';
+// const LOGICAL_OPS = [LESS_THAN, LESS_OR_EQUAL, GREATER_THAN, GREATER_OR_EQUAL, EQUAL_TO, 
+//                      EQUAL_TO_TYPED, UNEQUAL_TO, UNEQUAL_TO_TYPED, AND, OR, NOT] 
 const WHITESPACE = '  \t'; // todo: add more to these
 
 const PREAMBLE_RE = /^\s*(\w+)\s*:\s*(.+)*$/;
@@ -482,6 +509,7 @@ const NODE_UNARY_OP = 'UnaryOp';
 const NODE_BINARY_OP = 'BinaryOp';
 const NODE_NO_OP = 'NoOp';
 
+
 class Node {
     constructor(type, data) {
         this.type = type;
@@ -668,7 +696,7 @@ class PhraseParser extends Parser {
         }
         return node;
     }
-
+    
     ref() {
         let node = this.expr();
         if (this.currentToken.type !== REF_END) {
@@ -1039,10 +1067,7 @@ function evalPhrase(phraseBook, phrase, globalMemory, localMemory, t=0.0, level=
     //     throw new Error('Evaluation timed out. Do you have a recursive function?');
     // }
     let interpreter = new Interpreter({ phraseBook, phrase, globalMemory, localMemory, t, level, startTime });
-    debugger;
-    var x = interpreter.interpret();
-    debugger;
-    return x;
+    return interpreter.interpret();
 }
 
 function lookupPhrase(phraseBook, key) {
@@ -1095,20 +1120,94 @@ function parsePreamble(preamble, key, value, lineno) {
     }
 }
 
+function getLoadSketchMethod(loadSketchObject) {
+    if (typeof(loadSketchObject) === 'string') {
+        return getBaseMethodFromString(baseMethod);
+    } else if (typeof(loadSketchObject) === 'function') {
+        return loadSketchObject;
+    } else {
+        const baseMethod = loadSketchObject.baseMethod;
+        const customMethod = loadSketchObject.customMethod;
+        
+        if (customMethod !== undefined) {
+            console.log('Custom method provided.')
+            return customMethod;
+        } else if (typeof(baseMethod) === 'string') {
+            return getBaseMethodFromString(baseMethod);
+        } else {
+            throw new Error(`You need to either provide a customMethod with your own implementation of loading a sketch or you can use one of the baseMethod implementations, such as 'file' or 'url'.`);
+        }
+    }
+}
+
+function getBaseMethodFromString(baseMethodName) {
+    if (baseMethodName === 'file') {
+        return loadSketchFromFile;
+    } else if (baseMethodName === 'url') {
+        return loadSketchFromURL;
+    } else {
+        throw new Error(`Loading using baseMethod ${baseMethodName} is not supported. You can either implement your own customMethod or use base methods with values of 'file' or 'url'.`);
+    }
+}
+
+function loadSketchFromFile(path, encoding = 'utf-8') {
+    const fs = require('fs');
+    var loadedSketch = fs.readFileSync(path, encoding);
+    return loadedSketch;
+}; 
+
+// NEEDS FINISHING
+async function loadSketchFromURL(url) {
+    var request = require('request');
+
+    // var options = {
+    //     url: url,
+    //     method: 'GET',
+    //     json: true
+    // }
+    // request(options, function(err, response, body) {
+    //     if (err) console.log(err);
+    //     else {
+    //         console.log(body);
+    //     }
+    // });
+
+    // request
+    //     .get(url=`${url}.json`)
+    //     .on('response', function(response) {
+    //         const json = JSON.parse(response);
+    //         console.log(json);
+    //         return json;
+    //     })
+}
+
 const importedSketches = {};
 
 /**
  * This method takes in a Seed program source, parses it and creates a phraseBook according to it. 
  * This phrase book is later used for generation.
  * @param {*} s - Seed program as a string.
- * @param {*} loadSketch - A function that implements importing other sketches to be used alongside the main one. WILL CHANGE SOON.
+ * @param {*} loadSketch - 
+ * @param {*} conditionalVariables - A JS object with variable:value pairs that are used in conditional generation. 
  */
-async function parsePhraseBook(s, loadSketch) {
+async function parsePhraseBook(s, loadSketch, conditionalVariables) {
     const importSketches = [];
     const preamble = {};
     const phrases = [];
     let currentPhrase;
     const lines = s.split('\n');
+    // For each variable in conditionalVariables, it is loaded into memory as actual variable
+    // using asyncEval for initialization.
+    try {
+        for (variable in conditionalVariables) {
+            let code = variable + ' = ' + conditionalVariables[variable] + ';';
+            await asyncEval(code, (result) => {
+                // console.log('Executed code: ' + code);
+            });
+        }
+    }  catch(err) {
+        console.log(`Error when trying to initialize variables for conditional generation: ${err}`);
+    }
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmedLine = line.trim();
@@ -1159,8 +1258,40 @@ async function parsePhraseBook(s, loadSketch) {
             if (!currentPhrase) {
                 throw new Error(`Line ${ i + 1 }: line without a key.`);
             }
-            currentPhrase.values.push(line.substring(2));
-            currentPhrase.lines.push(i + 1);
+            let choiceLine = line.substring(2);
+            let conditional;
+            // True if there is a condition attached to the choice and need to be evaluated first
+            if (choiceLine.startsWith(CONDITION_TAG_START)) {
+                // console.log('Condition tag start detected.');
+                let conditionalEndIndex = choiceLine.indexOf(CONDITION_TAG_END);
+                if (conditionalEndIndex !== -1) { 
+                    conditional = choiceLine.substring(CONDITION_TAG_START.length, conditionalEndIndex);
+                } else {
+                    throw new Error(`The condition at line ${i+1} is never closed with ${CONDITION_TAG_END} for line with conditional declaration '- ${CONDITION_TAG_START}'.`);
+                }
+                let evaluatedConditional;
+                // wildcard sign means the phrase is always included in phrasebook
+                if (conditional === WILDCARD_SIGN) {
+                    evaluatedConditional = true;
+                    currentPhrase.values.push(choiceLine.substring(conditionalEndIndex + CONDITION_TAG_END.length).trim());
+                    currentPhrase.lines.push(i + 1);
+                } else {
+                    try {
+                        // asynchronously evaluating the conditional and, if evaluated to true, adding the respective text to phrase book
+                        await asyncEval(conditional, (result) => {
+                            evaluatedConditional = result;
+                            if (evaluatedConditional) {
+                                currentPhrase.values.push(choiceLine.substring(conditionalEndIndex + CONDITION_TAG_END.length).trim());
+                                currentPhrase.lines.push(i + 1);                            }
+                        }); 
+                    } catch(err) {
+                        console.log(err);
+                    }
+                }
+            } else { // Executes if there is no condition before the choice phrase
+                currentPhrase.values.push(choiceLine);
+                currentPhrase.lines.push(i + 1);
+            }
         } else if (trimmedLine.endsWith(':')) {
             // Keys end with ":"
             let parser = new DefParser(new DefLexer(trimmedLine), i + 1);
@@ -1175,19 +1306,24 @@ async function parsePhraseBook(s, loadSketch) {
     }
 
     const imports = {};
+    console.log(`Load Sketch Contents: ${JSON.stringify(loadSketch)}`);
+    const loadSketchMethod = getLoadSketchMethod(loadSketch);
+    const loadSketchGlobalVars = loadSketch.global_vars !== undefined ? loadSketch.global_vars : {};
     for (let i = 0; i < importSketches.length; i += 1) {
         let o = importSketches[i];
         let sketch;
         if (importedSketches[o.name]) {
             sketch = importedSketches[o.name];
         } else {
-            sketch = await loadSketch(o.name);
-            if (sketch === null || sketch.source === undefined) {
+            console.log('LoadSketchMethod called');
+            sketch = await loadSketchMethod(o.name);
+            if (sketch === null) {
                 throw new Error(`Line ${ o.line }: Could not import sketch named "${o.name}".`)
             }
+            console.log('Sketch imported');
             importedSketches[o.name] = sketch;
         }
-        let pb = await parsePhraseBook(sketch.source, loadSketch);
+        let pb = await parsePhraseBook(sketch, loadSketchMethod, loadSketchGlobalVars);
         imports[o.alias] = pb;
     }
     const phraseBook = {};
@@ -1212,19 +1348,15 @@ async function parsePhraseBook(s, loadSketch) {
  * @param {*} t - Time.
  */
 async function  generateString(phraseBook, rootKey = 'root', globalMemory = {}, seed = 1234, t = 0.0) {
-    seedrandom(seed);
+    seedrandom(1234);
     const startTime = Date.now();
-    const removeNewline = require('newline-remove');
     
     // Identified problem wiht \r's messing up the output. Will need fixing at source (perhaps each evalPhrase emits \r\n needlessly?) so that true newlines are kept
-    return removeNewline(await evalPhrase(phraseBook, lookupPhrase(phraseBook, rootKey), globalMemory, {}, t, 0, startTime));
+    var generatedString = await evalPhrase(phraseBook, lookupPhrase(phraseBook, rootKey), globalMemory, {}, t, 0, startTime);
+    return generatedString;
+    // var strippedGeneratedString = generatedString.replace(/(\r\n|\n|\r)/gm, '');
+    // return strippedGeneratedString;
 
-    // var evaluated = []; 
-    // evaluated.push(await evalPhrase(phraseBook, lookupPhrase(phraseBook, rootKey), globalMemory, {}, t, 0, startTime));
-    // for (let i = 0; i < evaluated.length; i++) {
-    //     evaluated[i] = removeNewline(evaluated[i]);
-    //     console.log(`Item ${i}: ${evaluated[i]}\n`);
-    // }
 }
 
 // Functions and objects exported here are available for access through requiring this npm module

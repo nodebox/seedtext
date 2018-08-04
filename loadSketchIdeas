@@ -1,0 +1,9 @@
+1:
+
+Pass in both the method implementation and parameters object into parent function.
+If not provided custom function, fall back to default (local storage search). 
+
+2:
+
+Keep num of arguments, pass in object with function definition under loadSketch property
+and global variables to be used 

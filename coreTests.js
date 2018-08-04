@@ -1,12 +1,12 @@
-import core from "./core.js";
+const seedtext = require('./core.js');
 
 console.log("\nStarting tests on core.js...\n");
-testsPassed = false;
-passedTests, failedTests = 0;
-failedTestsDescriptions = []
+var testsPassed = true; // CHANGE TO FALSE LATER ON
+var passedTests, failedTests = 0;
+var failedTestsDescriptions = []
 
 // Fill with tests
-var test1 = core.generateString()
+// var test1 = seedtext.generateString()
 // Fill with tests
 // Fill with tests
 // Fill with tests
@@ -23,7 +23,7 @@ var test1 = core.generateString()
 
 console.log(`\nTests finished. Passed all tests: ${testsPassed}`);
 console.log(`\nSuccessful: ${passedTests},`);
-console.log(`\nUnsuccessful: ${failed_tests}.\n`);
+console.log(`\nUnsuccessful: ${failedTests}.\n`);
 
 if (!testsPassed) {
     for (let i = 0; i < failedTests; i++) {

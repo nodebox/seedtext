@@ -8,6 +8,7 @@
   ],
   "dependencies": {
     "newline-remove": "^1.0.2",
+    "request": "^2.87.0",
     "seedrandom": "^2.4.3"
   },
   "scripts": {
