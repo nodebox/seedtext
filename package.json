@@ -1,13 +1,12 @@
 {
   "name": "seedtext",
-  "version": "1.0.0",
+  "version": "1.2.2",
   "description": "Template-based procedural content generator for text, shapes and images",
   "main": "core.js",
   "files": [
     "core.js"
   ],
   "dependencies": {
-    "newline-remove": "^1.0.2",
     "request": "^2.87.0",
     "seedrandom": "^2.4.3"
   },
