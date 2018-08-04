@@ -1,0 +1,10 @@
+root:
+- {{ weather_report }}
+
+weather_report(rain_chance):
+- ([rain_chance < 0.1 && !(rain_chance > 0.2)]) No rain expected today.
+- ([rain_chance < 0.1 && !(rain_chance > 0.2)]) It won't rain today.
+- ([rain_chance < 0.5 && !(rain_chance < 0.2)]) It probably won't rain today.
+- ([rain_chance < 0.8 && !(rain_chance < 0.5)]) We're pretty sure it will rain.
+- ([rain_chance > 0.8]) Bring an umbrella!
+- ([_]) No idea what the weather is going to be.
