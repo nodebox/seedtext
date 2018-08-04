@@ -117,23 +117,23 @@ var seedSketch = loadSketchFromFile('path/to/your/sketch.txt');
 Now we need to somehow use the two methods provided by SeedText: _parsePhraseBook_ and _generateString_. One possible way of doing that would be by using an async wrapper around these and using _callback_ for result.
 
 ```javascript
-async function generate(seedSketch, loadSketch, callback) {
-    const phraseBook = await seedtext.parsePhraseBook(seedSketch, loadSketch, {'conditional_variable': 'some_value'});
+async function generate(seedSketch, loadSketch, conditionalVariables, callback) {
+    const phraseBook = await seedtext.parsePhraseBook(seedSketch, loadSketch, conditionalVariables);
     const generatedString = await seedtext.generateString(phraseBook, seed = 42);
     callback(generatedString);
 }
 ```
 
-The wrapper takes in three parameters. The first one - _seedSketch_ - contains the loaded Seed source. The second one specifies what method to load imported sketches with, if there are any. The third parameter is the callback. Now we can use this function as follows:
+The wrapper takes in four parameters. The first one - _seedSketch_ - contains the loaded Seed source. The second one specifies what method to load imported sketches with, if there are any. The third parameter is _conditionalVariables_ which can be used for passing in variables needed for conditional generation. The last parameter is the callback. Now we can use this function as follows:
 
 ```javascript
 // using built-in 'file' load method
-generate(seedSketch, 'file', (result) => {
+generate(seedSketch, 'file', {'conditional_variable': 'some_value'}, (result) => {
     console.log(JSON.stringify(result));
 });
 
 // using our previously defined custom load method
-generate(seedSketch, loadSketchFromFile, (result) => {
+generate(seedSketch, loadSketchFromFile, {'conditional_variable': 'some_value'}, (result) => {
     console.log(JSON.stringify(result));
 });
 ```

@@ -8,12 +8,12 @@ function loadSketchFromFile(path) {
 
 seedSketch = loadSketchFromFile('path/to/your/sketch.txt');   
 
-async function generate(seedSketch, loadSketch, callback) {
-    const phraseBook = await seedtext.parsePhraseBook(seedSketch, loadSketch, {'conditional_variable':'some_value'});
+async function generate(seedSketch, loadSketch, conditionalVariables, callback) {
+    const phraseBook = await seedtext.parsePhraseBook(seedSketch, loadSketch, conditionalVariables);
     const generatedString = await seedtext.generateString(phraseBook, seed=42);
     callback(generatedString);
 }
 
-generate(seedSketch, loadSketchFromFile, (result) => {
+generate(seedSketch, loadSketchFromFile, {'conditional_variable':'some_value'}, (result) => {
     console.log(JSON.stringify(result));
 });
