@@ -156,7 +156,7 @@ The package is distributed under MIT license.  The exact wording of the license 
 
 ## Contributors
 
-Frederik De Bleser
-Stefan Gabriëls
-Lieven Menschaert
-Kunal Mohta
+- Frederik De Bleser
+- Stefan Gabriëls
+- Lieven Menschaert
+- Kunal Mohta

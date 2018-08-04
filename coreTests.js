@@ -22,8 +22,8 @@ var failedTestsDescriptions = []
 // Fill with tests
 
 console.log(`\nTests finished. Passed all tests: ${testsPassed}`);
-console.log(`\nSuccessful: ${passedTests},`);
-console.log(`\nUnsuccessful: ${failedTests}.\n`);
+// console.log(`\nSuccessful: ${passedTests},`);
+// console.log(`\nUnsuccessful: ${failedTests}.\n`);
 
 if (!testsPassed) {
     for (let i = 0; i < failedTests; i++) {
