@@ -1348,8 +1348,8 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
  * @param {*} seed This is the seed number, used for replicability of results. Default is 1234.
  * @param {*} t This is the time variable, used for timeout. Might be obsolete right now and removed in later versions. Default is 0.0.
  */
-async function  generateString(phraseBook, rootKey = 'root', globalMemory = {}, seed = 1234, t = 0.0) {
-    seedrandom(1234);
+async function  generateString(phraseBook, rootKey = 'root', globalMemory = {}, seed = 42, t = 0.0) {
+    seedrandom(seed);
     const startTime = Date.now();
     
     var generatedString = await evalPhrase(phraseBook, lookupPhrase(phraseBook, rootKey), globalMemory, {}, t, 0, startTime);

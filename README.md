@@ -5,7 +5,7 @@
 
 SeedText is a JavaScript based procedural content generator, available as an [NPM module](https://npmjs.com/package/seedtext). It has been created by the [EMRG](https://www.emrg.be/) group based in Antwerp, Belgium. 
 
-##Installation
+## Installation
 
 SeedText is available as a standard NPM module so it can be easily installed using
 
