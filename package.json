@@ -14,6 +14,9 @@
     "test": "node coreTests.js",
     "prepublish": "npm test"
   },
+  "browser": {
+    "fs": false
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nodebox/seedtext.git"
