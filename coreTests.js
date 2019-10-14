@@ -1,9 +1,10 @@
 const seedtext = require('./core.js');
 
-console.log("\nStarting tests on core.js...\n");
+console.log('\nStarting tests on core.js...\n');
 var testsPassed = true; // CHANGE TO FALSE LATER ON
-var passedTests, failedTests = 0;
-var failedTestsDescriptions = []
+var passedTests,
+    failedTests = 0;
+var failedTestsDescriptions = [];
 
 // Fill with tests
 // var test1 = seedtext.generateString()
@@ -30,5 +31,5 @@ if (!testsPassed) {
         console.log(`\n - Test failed. Reason: ${failedTestsDescriptions[i]}\n`);
     }
     console.log('\n');
-    throw new Error('Some of the tests for this module failed. See decription printed above.')
+    throw new Error('Some of the tests for this module failed. See decription printed above.');
 }

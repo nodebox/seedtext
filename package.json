@@ -10,9 +10,13 @@
     "request": "^2.87.0",
     "seedrandom": "^2.4.3"
   },
+  "devDependencies": {
+    "prettier": "1.18.2"
+  },
   "scripts": {
     "test": "node coreTests.js",
-    "prepublish": "npm test"
+    "format": "prettier --write *.js",
+    "prepare": "npm run format && npm test"
   },
   "browser": {
     "fs": false

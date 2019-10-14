@@ -16,8 +16,10 @@ function randomChar(min, max) {
     return String.fromCharCode(charCode);
 }
 
-String.prototype.toTitleCase = function () {
-    return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+String.prototype.toTitleCase = function() {
+    return this.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
 };
 
 /**
@@ -47,12 +49,20 @@ RegExp.escape = function(s) {
 };
 
 function getURLParameter(name, url) {
-    if (typeof window === 'undefined') { return false; }
-    if (!url) { url = window.location.search; }
+    if (typeof window === 'undefined') {
+        return false;
+    }
+    if (!url) {
+        url = window.location.search;
+    }
     const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
         results = regex.exec(url);
-    if (!results) { return null; }
-    if (!results[2]) { return ''; }
+    if (!results) {
+        return null;
+    }
+    if (!results[2]) {
+        return '';
+    }
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
@@ -94,7 +104,7 @@ const RBRACK = ']';
 const COMMA = ',';
 const COLON = ':';
 // Token symbols for conditional expressions. No longer needed
-// becasue of the change in the way that conditional expressions 
+// becasue of the change in the way that conditional expressions
 // are  handled.
 // const LESS_THAN = '<';
 // const LESS_OR_EQUAL = '<=';
@@ -112,8 +122,8 @@ const WILDCARD_SIGN = '_';
 const DIGITS = '0123456789';
 const ALPHA = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ALPHANUM = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._';
-// const LOGICAL_OPS = [LESS_THAN, LESS_OR_EQUAL, GREATER_THAN, GREATER_OR_EQUAL, EQUAL_TO, 
-//                      EQUAL_TO_TYPED, UNEQUAL_TO, UNEQUAL_TO_TYPED, AND, OR, NOT] 
+// const LOGICAL_OPS = [LESS_THAN, LESS_OR_EQUAL, GREATER_THAN, GREATER_OR_EQUAL, EQUAL_TO,
+//                      EQUAL_TO_TYPED, UNEQUAL_TO, UNEQUAL_TO_TYPED, AND, OR, NOT]
 const WHITESPACE = '  \t'; // todo: add more to these
 
 const PREAMBLE_RE = /^\s*(\w+)\s*:\s*(.+)*$/;
@@ -134,7 +144,7 @@ function bounce(t) {
 }
 
 function lerp(min, max, t, animType) {
-    switch (animType){
+    switch (animType) {
         case 'linear':
             break;
 
@@ -166,7 +176,9 @@ class Lexer {
 
     error(char) {
         const s = char.length > 1 ? 's' : '';
-        throw new Error(`Invalid character${s} ${char} at position ${this.pos} in phrase '${this.text}'.`);
+        throw new Error(
+            `Invalid character${s} ${char} at position ${this.pos} in phrase '${this.text}'.`
+        );
     }
 
     advance() {
@@ -338,7 +350,7 @@ class PhraseLexer extends Lexer {
             } else {
                 this.advance();
             }
-            return new Token(ANIMATION_RANGE, {start, end});
+            return new Token(ANIMATION_RANGE, { start, end });
         }
     }
 
@@ -358,7 +370,7 @@ class PhraseLexer extends Lexer {
             } else if (this.currentChar === '"') {
                 this.advance();
                 return this._string('"');
-            } else if (this.currentChar === '\'') {
+            } else if (this.currentChar === "'") {
                 this.advance();
                 return this._string("'");
             } else if (this.checkCurrentNextChars('..')) {
@@ -509,7 +521,6 @@ const NODE_UNARY_OP = 'UnaryOp';
 const NODE_BINARY_OP = 'BinaryOp';
 const NODE_NO_OP = 'NoOp';
 
-
 class Node {
     constructor(type, data) {
         this.type = type;
@@ -545,13 +556,17 @@ class Parser {
 
 class PhraseParser extends Parser {
     error(tokenType) {
-        throw new Error(`Invalid syntax: expected a symbol of type ${tokenType} at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`);
+        throw new Error(
+            `Invalid syntax: expected a symbol of type ${tokenType} at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`
+        );
     }
 
     _filters(node) {
         while (this.currentToken.type === FILTER) {
             if (this.currentToken.value === '') {
-                throw new Error(`Naming Error. Encountered a filter token (|) at position ${ this.lexer.pos } without a filter name.`);
+                throw new Error(
+                    `Naming Error. Encountered a filter token (|) at position ${this.lexer.pos} without a filter name.`
+                );
             }
             node = new Node(NODE_FILTER, { node, name: this.currentToken.value });
             this.consume(FILTER);
@@ -563,13 +578,17 @@ class PhraseParser extends Parser {
     _range(node) {
         if (this.currentToken.type === RANGE) {
             if (node.type === NODE_STRING && node.value.length !== 1) {
-                throw new Error(`Range Error: Only single character strings can be part of a range. The encountered string '${ node.value }' at position ${ this.lexer.pos } has a length of ${ node.value.length }.`);
+                throw new Error(
+                    `Range Error: Only single character strings can be part of a range. The encountered string '${node.value}' at position ${this.lexer.pos} has a length of ${node.value.length}.`
+                );
             }
             this.consume(RANGE);
             let start = node;
             let end = this.factor(false);
             if (end.type === NODE_STRING && end.value.length !== 1) {
-                throw new Error(`Range Error: Only single character strings can be part of a range. The encountered string '${ end.value }' at position ${ this.lexer.pos } has a length of ${ end.value.length }.`);
+                throw new Error(
+                    `Range Error: Only single character strings can be part of a range. The encountered string '${end.value}' at position ${this.lexer.pos} has a length of ${end.value.length}.`
+                );
             }
             if (start.type === NODE_KEY && start.key.length === 1 && !start.parameters) {
                 start = new Node(NODE_CHAR, { value: start.key });
@@ -634,14 +653,19 @@ class PhraseParser extends Parser {
             node = new Node(NODE_REAL, { value: token.value });
         } else if (token.type === ANIMATION_RANGE) {
             this.consume(ANIMATION_RANGE);
-            node = new Node(NODE_ANIMATION_RANGE, { start: token.value.start, end: token.value.end });
+            node = new Node(NODE_ANIMATION_RANGE, {
+                start: token.value.start,
+                end: token.value.end
+            });
         } else if (token.type === STRING) {
             this.consume(STRING);
             node = new Node(NODE_STRING, { value: token.value });
         } else if (token.type === KEY) {
             this.consume(KEY);
             if (this.currentToken.type === KEY) {
-                throw new Error(`Invalid syntax at position ${this.lexer.pos}: Spaces are not allowed as part of identifiers. You could write '${token.value}_${this.currentToken.value}' instead.`);
+                throw new Error(
+                    `Invalid syntax at position ${this.lexer.pos}: Spaces are not allowed as part of identifiers. You could write '${token.value}_${this.currentToken.value}' instead.`
+                );
             }
             node = new Node(NODE_KEY, { key: token.value });
             node = this._name(node);
@@ -655,7 +679,9 @@ class PhraseParser extends Parser {
             }
             this.consume(RPAREN);
         } else {
-            throw new Error(`Invalid syntax: expected a symbol (an integer, float, string, ...) at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`);
+            throw new Error(
+                `Invalid syntax: expected a symbol (an integer, float, string, ...) at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`
+            );
         }
         if (parseFiltersRange) {
             node = this._filters(node);
@@ -682,7 +708,9 @@ class PhraseParser extends Parser {
         if (this.currentToken.type === REF_END) {
             return new Node(NODE_NO_OP);
         } else if (this.currentToken.type === RPAREN) {
-            throw new Error(`Invalid syntax: Encountered ) symbol at position ${this.lexer.pos} but no ( was seen.`);
+            throw new Error(
+                `Invalid syntax: Encountered ) symbol at position ${this.lexer.pos} but no ( was seen.`
+            );
         }
         let node = this.term();
         while (this.currentToken.type === PLUS || this.currentToken.type === MINUS) {
@@ -696,11 +724,13 @@ class PhraseParser extends Parser {
         }
         return node;
     }
-    
+
     ref() {
         let node = this.expr();
         if (this.currentToken.type !== REF_END) {
-            throw new Error(`Invalid syntax: expected end of reference at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`);
+            throw new Error(
+                `Invalid syntax: expected end of reference at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`
+            );
         }
         return new Node(NODE_REF, { node });
     }
@@ -742,14 +772,18 @@ class PhraseParser extends Parser {
 
 class DefParser extends Parser {
     error(tokenType) {
-        throw new Error(`Invalid syntax: expected a symbol of type ${tokenType} at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`);
+        throw new Error(
+            `Invalid syntax: expected a symbol of type ${tokenType} at position ${this.lexer.pos}, but encountered ${this.currentToken.type} instead.`
+        );
     }
 
     _key() {
         let key = this.currentToken.value;
         this.consume(KEY);
         if (this.currentToken.type === KEY) {
-            throw new Error(`Invalid syntax at position ${this.lexer.pos}: Spaces are not allowed as part of identifiers. You could write '${key}_${this.currentToken.value}' instead.`);
+            throw new Error(
+                `Invalid syntax at position ${this.lexer.pos}: Spaces are not allowed as part of identifiers. You could write '${key}_${this.currentToken.value}' instead.`
+            );
         }
         return key;
     }
@@ -786,9 +820,9 @@ class DefParser extends Parser {
                 this.error(EOF);
             }
             if (parameters.length === 0) {
-                return {key};
+                return { key };
             } else {
-                return {key, parameters};
+                return { key, parameters };
             }
         } catch (e) {
             throw new Error(`Line ${this.lineno}: ${e.message}`);
@@ -823,27 +857,27 @@ class Interpreter {
     async visitUnaryOp(node) {
         const op = node.op;
         if (op === PLUS) {
-            return + (await this.visit(node.expression));
+            return +(await this.visit(node.expression));
         } else if (op === MINUS) {
-            return - (await this.visit(node.expression));
+            return -(await this.visit(node.expression));
         }
     }
 
     async visitBinaryOp(node) {
         const op = node.op;
         if (op === PLUS) {
-            return await this.visit(node.left) + await this.visit(node.right);
+            return (await this.visit(node.left)) + (await this.visit(node.right));
         } else if (op === MINUS) {
-            return await this.visit(node.left) - await this.visit(node.right);
+            return (await this.visit(node.left)) - (await this.visit(node.right));
         } else if (op === MUL) {
-            return await this.visit(node.left) * await this.visit(node.right);
+            return (await this.visit(node.left)) * (await this.visit(node.right));
         } else if (op === DIV) {
-            return await this.visit(node.left) / await this.visit(node.right);
+            return (await this.visit(node.left)) / (await this.visit(node.right));
         }
     }
 
     async visitConcat(node) {
-        return await this.visit(node.left) + await this.visit(node.right);
+        return (await this.visit(node.left)) + (await this.visit(node.right));
     }
 
     visitText(node) {
@@ -878,7 +912,7 @@ class Interpreter {
             if (this.localMemory[start] !== undefined) {
                 start = this.localMemory[start];
             } else if (this.phraseBook[start] !== undefined) {
-                start = await this.visitKey(new Node(NODE_KEY, {key: start}));
+                start = await this.visitKey(new Node(NODE_KEY, { key: start }));
             }
         } else {
             start = await this.visit(node.start);
@@ -891,7 +925,7 @@ class Interpreter {
             if (this.localMemory[end] !== undefined) {
                 end = this.localMemory[end];
             } else if (this.phraseBook[end] !== undefined) {
-                end = await this.visitKey(new Node(NODE_KEY, {key: end}));
+                end = await this.visitKey(new Node(NODE_KEY, { key: end }));
             }
         } else {
             end = await this.visit(node.end);
@@ -903,11 +937,26 @@ class Interpreter {
             return Math.floor(rand(start, end));
         }
         let min, max, charCode;
-        if (typeof start === 'string' && start.length === 1 && typeof end === 'string' && end.length === 1) {
+        if (
+            typeof start === 'string' &&
+            start.length === 1 &&
+            typeof end === 'string' &&
+            end.length === 1
+        ) {
             return randomChar(start, end);
-        } else if (typeof start === 'string' && start.length === 1 && typeof end === 'number' && String(end).length === 1) {
+        } else if (
+            typeof start === 'string' &&
+            start.length === 1 &&
+            typeof end === 'number' &&
+            String(end).length === 1
+        ) {
             return randomChar(start, String(end));
-        } else if (typeof start === 'number' && String(start).length === 1 && typeof end === 'string' && end.length === 1) {
+        } else if (
+            typeof start === 'number' &&
+            String(start).length === 1 &&
+            typeof end === 'string' &&
+            end.length === 1
+        ) {
             return randomChar(String(start), end);
         } else {
             if (typeof start === 'string') {
@@ -920,7 +969,7 @@ class Interpreter {
         }
     }
 
-    async visitKey(node, searchLocal=true) {
+    async visitKey(node, searchLocal = true) {
         if (searchLocal && this.localMemory[node.key] !== undefined) {
             return this.localMemory[node.key];
         }
@@ -947,7 +996,15 @@ class Interpreter {
                 }
             }
         }
-        return evalPhrase(phraseBook, phrase, globalMemory, localMemory, this.t, this.level + 1, this.startTime);
+        return evalPhrase(
+            phraseBook,
+            phrase,
+            globalMemory,
+            localMemory,
+            this.t,
+            this.level + 1,
+            this.startTime
+        );
     }
 
     async visitNamedKey(node) {
@@ -976,7 +1033,9 @@ class Interpreter {
     }
 
     jsEvaluator(source) {
-        const evaluator = new Function(source + 'return function (_fn, args) { return eval(_fn).apply(null, args) };');
+        const evaluator = new Function(
+            source + 'return function (_fn, args) { return eval(_fn).apply(null, args) };'
+        );
         return evaluator();
     }
 
@@ -1020,7 +1079,11 @@ class Interpreter {
         } else if (f === 'title') {
             return String(v).toTitleCase();
         } else if (f === 'sentence') {
-            return String(v).substring(0, 1).toUpperCase() + String(v).substring(1);
+            return (
+                String(v)
+                    .substring(0, 1)
+                    .toUpperCase() + String(v).substring(1)
+            );
         } else if (f === 'str') {
             return String(v);
         } else if (f === 'int') {
@@ -1043,7 +1106,7 @@ class Interpreter {
         try {
             return this.visit(this.phrase.tree);
         } catch (e) {
-            throw new Error(`Line ${this.phrase.lineno}: ${e.message}`)
+            throw new Error(`Line ${this.phrase.lineno}: ${e.message}`);
         }
     }
 }
@@ -1057,16 +1120,34 @@ function parsePhrase(phrase, lineno) {
 
 function maxLevel(phraseBook) {
     const depth = phraseBook['%preamble'].depth;
-    if (depth !== undefined) { return depth; }
+    if (depth !== undefined) {
+        return depth;
+    }
     return MAX_LEVEL;
 }
 
-function evalPhrase(phraseBook, phrase, globalMemory, localMemory, t=0.0, level=0, startTime=0) {
+function evalPhrase(
+    phraseBook,
+    phrase,
+    globalMemory,
+    localMemory,
+    t = 0.0,
+    level = 0,
+    startTime = 0
+) {
     if (level > maxLevel(phraseBook)) return '';
     // if (TIMEOUT && startTime > 0 && Date.now() - startTime > TIMEOUT_MILLIS) {
     //     throw new Error('Evaluation timed out. Do you have a recursive function?');
     // }
-    let interpreter = new Interpreter({ phraseBook, phrase, globalMemory, localMemory, t, level, startTime });
+    let interpreter = new Interpreter({
+        phraseBook,
+        phrase,
+        globalMemory,
+        localMemory,
+        t,
+        level,
+        startTime
+    });
     return interpreter.interpret();
 }
 
@@ -1089,14 +1170,18 @@ function parsePreamble(preamble, key, value, lineno) {
     value = value.trim();
     if (key === 'depth') {
         if (!value.match(POS_INTEGER_RE)) {
-            throw new Error(`Line ${lineno}: expecting integer value for 'depth' property, not '${value}'.`);
+            throw new Error(
+                `Line ${lineno}: expecting integer value for 'depth' property, not '${value}'.`
+            );
         } else {
             preamble[key] = parseInt(value);
         }
     } else if (key === 'duration') {
         let m = value.match(DURATION_RE);
         if (!m || !m[3]) {
-            throw new Error(`Line ${lineno}: expecting seconds (e.g. 1s) or milliseconds (e.g. 1000ms) for 'duration' property, not '${value}'.`);
+            throw new Error(
+                `Line ${lineno}: expecting seconds (e.g. 1s) or milliseconds (e.g. 1000ms) for 'duration' property, not '${value}'.`
+            );
         } else {
             if (m[3] === 'ms') {
                 preamble[key] = parseFloat(m[1]) / 1000;
@@ -1106,12 +1191,15 @@ function parsePreamble(preamble, key, value, lineno) {
         }
     } else if (key === 'animation') {
         if (ANIMATION_TYPES.indexOf(value) === -1) {
-            throw new Error(`Line ${lineno}: expecting one of bounce/linear/once for 'animation' property, not '${value}'.`);
+            throw new Error(
+                `Line ${lineno}: expecting one of bounce/linear/once for 'animation' property, not '${value}'.`
+            );
         } else {
             preamble[key] = value;
         }
     } else if (key === 'script') {
-        if (!value.endsWith('.js')) throw new Error(`Line ${lineno}: expecting script preamble to end with .js.`);
+        if (!value.endsWith('.js'))
+            throw new Error(`Line ${lineno}: expecting script preamble to end with .js.`);
         const currentScripts = Array.from(document.head.getElementsByTagName('script'));
         if (currentScripts.some(tag => tag.src === value)) return;
         const tag = document.createElement('script');
@@ -1121,21 +1209,23 @@ function parsePreamble(preamble, key, value, lineno) {
 }
 
 function getLoadSketchMethod(loadSketchObject) {
-    if (typeof(loadSketchObject) === 'string') {
+    if (typeof loadSketchObject === 'string') {
         return getBaseMethodFromString(baseMethod);
-    } else if (typeof(loadSketchObject) === 'function') {
+    } else if (typeof loadSketchObject === 'function') {
         return loadSketchObject;
     } else {
         const baseMethod = loadSketchObject.baseMethod;
         const customMethod = loadSketchObject.customMethod;
-        
+
         if (customMethod !== undefined) {
-            console.log('Custom method provided.')
+            console.log('Custom method provided.');
             return customMethod;
-        } else if (typeof(baseMethod) === 'string') {
+        } else if (typeof baseMethod === 'string') {
             return getBaseMethodFromString(baseMethod);
         } else {
-            throw new Error(`You need to either provide a customMethod with your own implementation of loading a sketch or you can use one of the baseMethod implementations, such as 'file' or 'url'.`);
+            throw new Error(
+                `You need to either provide a customMethod with your own implementation of loading a sketch or you can use one of the baseMethod implementations, such as 'file' or 'url'.`
+            );
         }
     }
 }
@@ -1146,7 +1236,9 @@ function getBaseMethodFromString(baseMethodName) {
     } else if (baseMethodName === 'url') {
         return loadSketchFromURL;
     } else {
-        throw new Error(`Loading using baseMethod ${baseMethodName} is not supported. You can either implement your own customMethod or use base methods with values of 'file' or 'url'.`);
+        throw new Error(
+            `Loading using baseMethod ${baseMethodName} is not supported. You can either implement your own customMethod or use base methods with values of 'file' or 'url'.`
+        );
     }
 }
 
@@ -1154,7 +1246,7 @@ function loadSketchFromFile(path, encoding = 'utf-8') {
     const fs = require('fs');
     var loadedSketch = fs.readFileSync(path, encoding);
     return loadedSketch;
-}; 
+}
 
 // NEEDS FINISHING
 async function loadSketchFromURL(url) {
@@ -1184,9 +1276,9 @@ async function loadSketchFromURL(url) {
 const importedSketches = {};
 
 /**
- * This method takes in a Seed program source, parses it and creates a phraseBook according to it. 
+ * This method takes in a Seed program source, parses it and creates a phraseBook according to it.
  * This phrase book is later used for generation.
- * @param {*} s The source code of the Seed template according to which the generation should be done. 
+ * @param {*} s The source code of the Seed template according to which the generation should be done.
  * @param {*} loadSketch - This variable can be of two distinct types. It can be a string or a function. Depending on its type, the usage is as follows:
  * - string: In this case, loadSketch contains string that specifies which of the base sketch loading methods to use. Supported keywords are 'file' and 'url'.
  * - function: If a custom implementation of loading method is needed, it can be simply passed in using this parameter. This function should return the source of the loaded sketch.
@@ -1205,11 +1297,11 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
     try {
         for (variable in conditionalVariables) {
             let code = variable + ' = ' + conditionalVariables[variable] + ';';
-            await asyncEval(code, (result) => {
+            await asyncEval(code, result => {
                 // console.log('Executed code: ' + code);
             });
         }
-    }  catch(err) {
+    } catch (err) {
         console.log(`Error when trying to initialize variables for conditional generation: ${err}`);
     }
     for (let i = 0; i < lines.length; i++) {
@@ -1219,11 +1311,11 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
             // Phrases continue with two spaces.
             // This comes first because some of the next rules trim the spaces, which we don't want here.
             if (!currentPhrase) {
-                throw new Error(`Line ${ i + 1 }: continuation line without a starting block.`);
+                throw new Error(`Line ${i + 1}: continuation line without a starting block.`);
             }
             const lastIndex = currentPhrase.values.length - 1;
             if (lastIndex < 0) {
-                throw new Error(`Line ${ i + 1 }: continuation line without a previous line.`);
+                throw new Error(`Line ${i + 1}: continuation line without a previous line.`);
             }
             const lastPhrase = currentPhrase.values[lastIndex];
             console.assert(typeof lastPhrase === 'string');
@@ -1239,28 +1331,28 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
         } else if (line.startsWith('%')) {
             // Preamble
             currentPhrase = undefined;
-            let m, l = trimmedLine.slice(1).trim();
+            let m,
+                l = trimmedLine.slice(1).trim();
             if (l.startsWith('import')) {
                 m = l.match(IMPORT_RE);
                 if (m) {
-                    importSketches.push({name: m[1], alias: m[2], line: i + 1});
+                    importSketches.push({ name: m[1], alias: m[2], line: i + 1 });
                     continue;
                 } else {
-                    throw new Error(`Line ${ i + 1 }: Error in import statement.`);
+                    throw new Error(`Line ${i + 1}: Error in import statement.`);
                 }
             }
             m = line.slice(1).match(PREAMBLE_RE);
             if (m) {
                 parsePreamble(preamble, m[1], m[2], i + 1);
-            }
-            else if (trimmedLine.length !== 0) {
-                throw new Error(`Line ${ i + 1}: expecting '% value: property' for the preamble.`);
+            } else if (trimmedLine.length !== 0) {
+                throw new Error(`Line ${i + 1}: expecting '% value: property' for the preamble.`);
             }
             continue;
         } else if (line.startsWith('- ')) {
             // Phrases are prefixed with '-'.
             if (!currentPhrase) {
-                throw new Error(`Line ${ i + 1 }: line without a key.`);
+                throw new Error(`Line ${i + 1}: line without a key.`);
             }
             let choiceLine = line.substring(2);
             let conditional;
@@ -1268,31 +1360,45 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
             if (choiceLine.startsWith(CONDITION_TAG_START)) {
                 // console.log('Condition tag start detected.');
                 let conditionalEndIndex = choiceLine.indexOf(CONDITION_TAG_END);
-                if (conditionalEndIndex !== -1) { 
-                    conditional = choiceLine.substring(CONDITION_TAG_START.length, conditionalEndIndex);
+                if (conditionalEndIndex !== -1) {
+                    conditional = choiceLine.substring(
+                        CONDITION_TAG_START.length,
+                        conditionalEndIndex
+                    );
                 } else {
-                    throw new Error(`The condition at line ${i+1} is never closed with ${CONDITION_TAG_END} for line with conditional declaration '- ${CONDITION_TAG_START}'.`);
+                    throw new Error(
+                        `The condition at line ${i +
+                            1} is never closed with ${CONDITION_TAG_END} for line with conditional declaration '- ${CONDITION_TAG_START}'.`
+                    );
                 }
                 let evaluatedConditional;
                 // wildcard sign means the phrase is always included in phrasebook
                 if (conditional === WILDCARD_SIGN) {
                     evaluatedConditional = true;
-                    currentPhrase.values.push(choiceLine.substring(conditionalEndIndex + CONDITION_TAG_END.length).trim());
+                    currentPhrase.values.push(
+                        choiceLine.substring(conditionalEndIndex + CONDITION_TAG_END.length).trim()
+                    );
                     currentPhrase.lines.push(i + 1);
                 } else {
                     try {
                         // asynchronously evaluating the conditional and, if evaluated to true, adding the respective text to phrase book
-                        await asyncEval(conditional, (result) => {
+                        await asyncEval(conditional, result => {
                             evaluatedConditional = result;
                             if (evaluatedConditional) {
-                                currentPhrase.values.push(choiceLine.substring(conditionalEndIndex + CONDITION_TAG_END.length).trim());
-                                currentPhrase.lines.push(i + 1);                            }
-                        }); 
-                    } catch(err) {
+                                currentPhrase.values.push(
+                                    choiceLine
+                                        .substring(conditionalEndIndex + CONDITION_TAG_END.length)
+                                        .trim()
+                                );
+                                currentPhrase.lines.push(i + 1);
+                            }
+                        });
+                    } catch (err) {
                         console.log(err);
                     }
                 }
-            } else { // Executes if there is no condition before the choice phrase
+            } else {
+                // Executes if there is no condition before the choice phrase
                 currentPhrase.values.push(choiceLine);
                 currentPhrase.lines.push(i + 1);
             }
@@ -1305,7 +1411,7 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
             currentPhrase.lineno = i + 1;
             phrases.push(currentPhrase);
         } else {
-            throw new Error(`Line ${ i + 1 }: do not know what to do with line "${line}".`);
+            throw new Error(`Line ${i + 1}: do not know what to do with line "${line}".`);
         }
     }
 
@@ -1320,7 +1426,7 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
         } else {
             sketch = await loadSketchMethod(o.name);
             if (sketch === null) {
-                throw new Error(`Line ${ o.line }: Could not import sketch named "${o.name}".`)
+                throw new Error(`Line ${o.line}: Could not import sketch named "${o.name}".`);
             }
             importedSketches[o.name] = sketch;
         }
@@ -1329,7 +1435,11 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
     }
     const phraseBook = {};
     for (let phrase of phrases) {
-        phraseBook[phrase.key] = phrase.values.map((text, index) => ({text, tree: parsePhrase(text, phrase.lines[index]), lineno: phrase.lines[index]}));
+        phraseBook[phrase.key] = phrase.values.map((text, index) => ({
+            text,
+            tree: parsePhrase(text, phrase.lines[index]),
+            lineno: phrase.lines[index]
+        }));
         phraseBook[phrase.key].lineno = phrase.lineno;
         if (phrase.parameters) {
             phraseBook[phrase.key].parameters = phrase.parameters;
@@ -1342,17 +1452,25 @@ async function parsePhraseBook(s, loadSketch = 'file', conditionalVariables = {}
 
 /**
  * This method takes in a phraseBook and uses it to generate a string generated based on the rules specified in the phraseBook. The generation can be seeded, enhanced by globalMemory and so on.
- * @param {*} phraseBook A phraseBook generated by calling prasePhraseBook method. See description of this method for more information. 
+ * @param {*} phraseBook A phraseBook generated by calling prasePhraseBook method. See description of this method for more information.
  * @param {*} rootKey This parameter specifies the key in the Seed source file to be used as the root for generation. Generally, 'root' should be the value here, unless there is real need for using something else. Default is 'root'.
  * @param {*} globalMemory This parameter can be used to optionally define variables that will be available globally. Default is {}.
  * @param {*} seed This is the seed number, used for replicability of results. Default is 1234.
  * @param {*} t This is the time variable, used for timeout. Might be obsolete right now and removed in later versions. Default is 0.0.
  */
-async function  generateString(phraseBook, rootKey = 'root', globalMemory = {}, seed = 42, t = 0.0) {
+async function generateString(phraseBook, rootKey = 'root', globalMemory = {}, seed = 42, t = 0.0) {
     seedrandom(seed);
     const startTime = Date.now();
-    
-    var generatedString = await evalPhrase(phraseBook, lookupPhrase(phraseBook, rootKey), globalMemory, {}, t, 0, startTime);
+
+    var generatedString = await evalPhrase(
+        phraseBook,
+        lookupPhrase(phraseBook, rootKey),
+        globalMemory,
+        {},
+        t,
+        0,
+        startTime
+    );
     return generatedString;
     // For stripping the carriage return from output.
     // var strippedGeneratedString = generatedString.replace(/(\r\n|\n|\r)/gm, '');
@@ -1363,4 +1481,4 @@ async function  generateString(phraseBook, rootKey = 'root', globalMemory = {}, 
 module.exports = {
     parsePhraseBook,
     generateString
-}
+};
